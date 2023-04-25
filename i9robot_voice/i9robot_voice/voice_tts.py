@@ -15,6 +15,7 @@ class TextToSpeech(Node):
 
     def speak_callback(self, msg):
         text = msg.data
+        text = text.replace('"','') # remove qoutes "" from text string as it causes error in edge-tts processing
         voice = 'en-US-ChristopherNeural'
         #voice = 'en-GB-SoniaNeural'
         chunks = text.split()
