@@ -6,7 +6,7 @@ from rclpy.node import Node
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 import cv2
-import face_recognition
+import face_recognition #pip3 install face-recognition
 import time
 
 

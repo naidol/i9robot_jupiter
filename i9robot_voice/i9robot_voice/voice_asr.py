@@ -38,7 +38,8 @@ class SpeechRecognitionNode(Node):
                 self.get_logger().info(text)
                 # check if the wake word list is in the recognized text
                 if any(item in text.lower() for item in self.wakeword_tokens):
-                    self.send_voice_command(text)
+                    if len(text.split()) >= 4: # only process audio if 4 or more words
+                        self.send_voice_command(text)
                 else: 
                     self.get_logger().warn("Wakeword not detected")
             except sr.UnknownValueError:

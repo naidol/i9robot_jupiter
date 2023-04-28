@@ -21,7 +21,7 @@ class VoiceCommandNode(Node):
     # check for specific voice commands, else assume that its a standard voice request to GPT-3
     def callback(self, msg):       
         prompt = msg.data   # get the voice command message into text format
-        if 'time now' in prompt.lower():
+        if 'time' in prompt.lower():
             time_text = self.calc_time()
             self.send_voice_tts('the time is ' + time_text)
         elif 'date' in prompt.lower():
@@ -30,7 +30,10 @@ class VoiceCommandNode(Node):
         elif 'name' in prompt.lower():
             name_text='I dont have a name as yet. I have a wake word. i am an AI robot created by Mr Logan'
             self.send_voice_tts(name_text)
-        else:
+        elif 'move' in prompt.lower():
+            name_text='ok. i am moving.'
+            self.send_voice_tts(name_text)
+        elif 'gpt' in prompt.lower():
             gpt_output = self.get_chat_gpt3_response(prompt)
             self.send_voice_tts(gpt_output)
     

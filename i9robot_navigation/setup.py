@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'i9robot_camera'
+package_name = 'i9robot_navigation'
 
 setup(
     name=package_name,
@@ -20,8 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "cam_raw_stream = i9robot_camera.cam_raw_stream:main",
-            "cam_face_detect = i9robot_camera.cam_face_detect:main"
+            "nav_move_base = i9robot_navigation.nav_move_base:main",
         ],
     },
 )
