@@ -23,7 +23,7 @@ class MoveBase(Node):
     def move_base_callback (self, msg):
         text = msg.data
         if 'study' in text.lower():
-            self.move_to_goal(0.0, 0.0, 0.0) # location of study on the map
+            self.move_to_goal(1.0, 0.0, 0.0) # location of study on the map
         elif 'kitchen' in text.lower():
             self.move_to_goal(8.0, -1.5, 0.0) # location of the kitchen on the map
         elif 'passage' in text.lower():
@@ -37,18 +37,18 @@ class MoveBase(Node):
 
     def move_to_goal(self, pos_x, pos_y, rot_z):
         try:
-            goal_pose = self.create_pose_stamped(pos_x, pos_y, rot_z)
+            goal_pose = self.create_pose_stamped(self.navigator, pos_x, pos_y, rot_z)
             # --- Going to one pose ---
             self.navigator.goToPose(goal_pose)
             while not self.navigator.isTaskComplete():
                 feedback = self.navigator.getFeedback()
                 self.get_logger().info(str(feedback))              
         except Exception as e:
-            self.get_logger().warn(e)
+            #self.get_logger().warn(e)
             self.send_voice_tts('Destination unreachable')
         finally:
             self.get_logger().info(str(self.navigator.getResult()))
-            self.send_voice_tts('Destination reached')
+            #self.send_voice_tts('Destination reached')
         
                             
     def create_pose_stamped(self, navigator, position_x, position_y, rotation_z):
