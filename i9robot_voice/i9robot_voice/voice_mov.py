@@ -31,9 +31,9 @@ class MoveBase(Node):
         elif 'tv' in text.lower():
             self.move_to_goal(3.0, -6.0, 0.0) # location of the tv on the map
         elif 'piano' in text.lower():
-            self.move_to_goal(9.0, -7.0, 0.0) # location of the tv on the map
+            self.move_to_goal(9.0, -7.0, 0.0) # location of the piano on the map
         elif 'bedroom two' in text.lower():
-            self.move_to_goal(10.0, -11.0, 0.0) # location of the tv on the map
+            self.move_to_goal(10.0, -11.0, 0.0) # location of the bed-2 on the map
 
     def move_to_goal(self, pos_x, pos_y, rot_z):
         try:
@@ -42,16 +42,16 @@ class MoveBase(Node):
             self.navigator.goToPose(goal_pose)
             while not self.navigator.isTaskComplete():
                 feedback = self.navigator.getFeedback()
-                self.get_logger().info(str(feedback))              
+                #self.get_logger().info(str(feedback))              
         except Exception as e:
-            #self.get_logger().warn(e)
+            self.get_logger().error(f'Request error: {e}')
             self.send_voice_tts('Destination unreachable')
         finally:
             self.get_logger().info(str(self.navigator.getResult()))
-            #self.send_voice_tts('Destination reached')
+            self.send_voice_tts('Destination reached')
         
                             
-    def create_pose_stamped(self, navigator, position_x, position_y, rotation_z):
+    def create_pose_stamped(self, navigator: BasicNavigator, position_x, position_y, rotation_z):
         q_x, q_y, q_z, q_w = tf_transformations.quaternion_from_euler(0.0, 0.0, rotation_z)
         goal_pose = PoseStamped()
         goal_pose.header.frame_id = 'map'
@@ -69,8 +69,9 @@ class MoveBase(Node):
     def send_voice_tts(self, text):
         tts_msg = String()
         tts_msg.data = text
-        self.get_logger().info(text)
         self.publisher.publish(tts_msg)
+        #self.get_logger().info(text)
+        
 
 def main(args=None):
     rclpy.init(args=args)

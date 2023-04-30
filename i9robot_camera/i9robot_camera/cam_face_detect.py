@@ -8,6 +8,7 @@ from sensor_msgs.msg import Image
 import cv2
 import face_recognition #pip3 install face-recognition
 import time
+from std_msgs.msg import String
 
 
 class FaceRecognitionNode(Node):
@@ -25,11 +26,11 @@ class FaceRecognitionNode(Node):
         image1 = face_recognition.load_image_file("/home/logan/i9robot_ws/src/i9robot_camera/known_faces/Logan/logan.jpg")
         encoding1 = face_recognition.face_encodings(image1)[0]
         self.known_face_encodings.append(encoding1)
-        self.known_face_names.append("Logan Naidoo")
-        image2 = face_recognition.load_image_file("/home/logan/i9robot_ws/src/i9robot_camera/known_faces/Anis/anis.png")
+        self.known_face_names.append("Logan")
+        image2 = face_recognition.load_image_file("/home/logan/i9robot_ws/src/i9robot_camera/known_faces/Indrani/indrani.jpg")
         encoding2 = face_recognition.face_encodings(image2)[0]
         self.known_face_encodings.append(encoding2)
-        self.known_face_names.append("Anis")
+        self.known_face_names.append("Indrani")
         
         # Initialize camera
         # self.cap = cv2.VideoCapture(0)
@@ -39,15 +40,17 @@ class FaceRecognitionNode(Node):
         self.start_time = time.time()
         self.num_frames = 0
         self.fps = 0
+
+        # Initialise face_detect timer memory
+        self.remember_face_timer = time.time()
+        self.faces_list=[]
         
         # Create subscriber and publisher
         self.image_sub = self.create_subscription(Image,"camera/image_raw",self.image_callback,10)
         self.image_pub = self.create_publisher(Image,"face_recognition/output",10)
+        self.publisher = self.create_publisher(String, "/voice_tts", 10)
 
     def image_callback(self, msg):
-        # Update the logger counter
-        #self.counter_ += 1
-        #self.get_logger().info("Loop: " + str(self.counter_))
         # Convert ROS message to OpenCV image
         frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
         
@@ -67,9 +70,11 @@ class FaceRecognitionNode(Node):
             best_match_index = face_distances.argmin()
             if matches[best_match_index]:
                 name = self.known_face_names[best_match_index]
-            
             face_names.append(name)
         
+            # Greet Face using the voice TTS
+            self.greet_face(name)   
+            
         # Draw rectangles and names on frame
         for (top, right, bottom, left), name in zip(face_locations, face_names):
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
@@ -88,6 +93,26 @@ class FaceRecognitionNode(Node):
         output_msg = self.bridge.cv2_to_imgmsg(frame, encoding="bgr8")
         self.image_pub.publish(output_msg)
         #cv2.imshow("Face Recognition", frame)
+
+    # send the message to convert text to voice via the /voice_tts topic
+    def send_voice_tts(self, text):
+        tts_msg = String()
+        tts_msg.data = text
+        self.publisher.publish(tts_msg)
+        #self.get_logger().info(text)
+
+    def greet_face(self, face):
+            if face in self.faces_list:
+                elapsed_time = time.time() - self.remember_face_timer
+                if elapsed_time > 20.0:
+                    self.send_voice_tts('Welcome back ' + face)
+                    #self.faces_list.remove(face)
+                    self.remember_face_timer = time.time()
+            else:
+                self.faces_list.append(face)
+                self.send_voice_tts('Hello ' + face)
+
+
 
 
 def main(args=None):

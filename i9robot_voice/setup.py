@@ -22,7 +22,8 @@ setup(
         'console_scripts': [
             "voice_asr = i9robot_voice.voice_asr:main",
             "voice_tts = i9robot_voice.voice_tts:main",
-            "voice_cmd = i9robot_voice.voice_cmd:main"
+            "voice_cmd = i9robot_voice.voice_cmd:main",
+            "voice_mov = i9robot_voice.voice_mov:main"
         ],
     },
 )

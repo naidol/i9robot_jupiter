@@ -37,7 +37,7 @@ class TextToSpeech(Node):
                 while pygame.mixer.music.get_busy():
                     pygame.time.Clock().tick(10)
             except Exception as e:
-                print (e)
+                self.get_logger().error(f'Request error: {e}')
             finally:
                 pygame.mixer.music.stop()
                 pygame.mixer.quit()
